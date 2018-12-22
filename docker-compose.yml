@@ -1,0 +1,65 @@
+version: '3'
+services: 
+  db: 
+    image: mysql:5.7
+    container_name: chatbot_db
+    restart: always
+    ports: 
+      - "3306:3306"  
+    environment: 
+      - MYSQL_ROOT_PASSWORD=iii
+    volumes: 
+      - ./Chatbot_Dev/mysql_data:/var/lib/mysql
+      - ./Chatbot_Dev/mysql_init:/docker-entrypoint-initdb.d/
+  api:
+    build:
+      context: ./dockerfile
+      dockerfile: ./dockerfile-api
+    container_name: chatbot_api
+    restart: always
+    user: root
+    environment:
+      - GRANT_SUDO=yes
+    ports:
+      - "8880:8888"
+      - "5001:5000"
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - ./Chatbot_Dev/code:/home/jovyan/work/
+    command:  start-notebook.sh --NotebookApp.token=''
+  redis:
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-redis
+    container_name: chatbot_redis
+    ports:
+     - "6379:6379"
+    volumes:
+     - ./Chatbot_Line/redis/data:/data
+#     - ./redis/redis.config:/usr/local/etc/redis/redis.conf
+  line-api:
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-line
+    container_name: chatbot_line
+    depends_on: 
+      - redis
+    ports:
+      - "8888:8888"
+      - "5000:5000"
+    command: start-notebook.sh --NotebookApp.token=''
+    volumes:
+     - ./Chatbot_Line/code:/home/jovyan/work
+  ngrok-external-dns:
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-ngrok
+    container_name: chatbot_ngrok
+    depends_on: 
+      - line-api
+    ports:
+      - "4040:4040"
+    command: ngrok http chatbot_line:5000

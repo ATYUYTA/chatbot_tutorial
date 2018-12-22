@@ -1,0 +1,114 @@
+create database chatbot_db;
+use chatbot_db;
+ALTER DATABASE chatbot_db CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+create table users (
+    user_open_id varchar(255),
+    user_nick_name varchar(255),
+    user_status varchar(255),
+    user_img varchar(255),
+    user_register_date varchar(255),
+    user_register_menu varchar(255),
+    PRIMARY KEY (user_open_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create table menus (
+	menu_id varchar(255),
+	menu_content JSON,
+	PRIMARY KEY (menu_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create table assoc_sa_questions (
+	question_id INTEGER(255),
+	question_content TEXT,
+	answer1_content TEXT,
+	answer2_content TEXT,
+	answer3_content TEXT,
+	answer4_content TEXT,
+	true_answer VARCHAR(255),
+	true_answer_decribe_content TEXT,
+	external_link VARCHAR(255),
+	PRIMARY KEY (question_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA LOCAL INFILE  '/docker-entrypoint-initdb.d/SA'
+INTO TABLE `chatbot_db`.`assoc_sa_questions`
+CHARACTER SET UTF8
+FIELDS TERMINATED BY '\t' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table assoc_dev_questions (
+	question_id INTEGER(255),
+	question_content TEXT,
+	answer1_content TEXT,
+	answer2_content TEXT,
+	answer3_content TEXT,
+	answer4_content TEXT,
+	true_answer varchar(255),
+	true_answer_decribe_content TEXT,
+	external_link VARCHAR(255),
+	PRIMARY KEY (question_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+LOAD DATA LOCAL INFILE  '/docker-entrypoint-initdb.d/Develope'
+INTO TABLE `chatbot_db`.`assoc_dev_questions`
+CHARACTER SET UTF8
+FIELDS TERMINATED BY '\t' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+
+create table assoc_sys_questions (
+	question_id INTEGER(255),
+	question_content TEXT,
+	answer1_content TEXT,
+	answer2_content TEXT,
+	answer3_content TEXT,
+	answer4_content TEXT,
+	true_answer VARCHAR(255),
+	true_answer_decribe_content TEXT,
+	external_link VARCHAR(255),
+	PRIMARY KEY (question_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+LOAD DATA LOCAL INFILE  '/docker-entrypoint-initdb.d/SYS'
+INTO TABLE `chatbot_db`.`assoc_sys_questions`
+CHARACTER SET UTF8
+FIELDS TERMINATED BY '\t' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+create table user_back (
+    user_id varchar(50),
+    user_name varchar(255),
+    user_phone varchar(255),
+    user_email varchar(255),
+    user_context TEXT,
+    user_bool varchar(50),
+    user_data varchar(50),
+    PRIMARY KEY (user_id)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create table login (
+    username varchar(50),
+    password varchar(50),
+    PRIMARY KEY (username)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create user 'read_only_user'@'%' IDENTIFIED BY 'iii';
+GRANT SELECT ON chatbot_db.users TO 'read_only_user'@'%' IDENTIFIED BY 'iii';
+GRANT SELECT ON chatbot_db.menus TO 'read_only_user'@'%' IDENTIFIED BY 'iii';
+GRANT SELECT ON chatbot_db.assoc_sa_questions TO 'read_only_user'@'%' IDENTIFIED BY 'iii';
+GRANT SELECT ON chatbot_db.assoc_dev_questions TO 'read_only_user'@'%' IDENTIFIED BY 'iii';
+GRANT SELECT ON chatbot_db.assoc_sys_questions TO 'read_only_user'@'%' IDENTIFIED BY 'iii';
+
+
+
+
+
+
+
